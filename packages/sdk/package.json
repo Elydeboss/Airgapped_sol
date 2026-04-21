@@ -1,0 +1,80 @@
+{
+  "name": "@airgapped-priv/sdk",
+  "version": "0.1.0",
+  "description": "Non-custodial, air-gapped Solana SDK with zero vendor lock-in",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs",
+      "default": "./dist/index.js"
+    },
+    "./core": {
+      "types": "./dist/core.d.ts",
+      "import": "./dist/core.js",
+      "require": "./dist/core.cjs"
+    },
+    "./hooks": {
+      "types": "./dist/hooks.d.ts",
+      "import": "./dist/hooks.js",
+      "require": "./dist/hooks.cjs"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "dev": "tsup --watch",
+    "lint": "eslint src --ext .ts,.tsx",
+    "test": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "solana",
+    "air-gapped",
+    "offline-signing",
+    "non-custodial",
+    "wallet",
+    "cold-storage",
+    "qr-code",
+    "blockchain"
+  ],
+  "author": "OfflineSign",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/airgapped-priv/sdk"
+  },
+  "dependencies": {
+    "@solana/web3.js": "^1.98.0",
+    "@solana/wallet-adapter-react": "^0.15.35",
+    "@solana/wallet-adapter-wallets": "^0.19.32",
+    "@noble/hashes": "^1.5.0",
+    "bs58": "^6.0.0",
+    "qrcode": "^1.5.3",
+    "zustand": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "tsup": "^8.3.0",
+    "typescript": "^5.7.0",
+    "vitest": "^2.1.0"
+  },
+  "peerDependencies": {
+    "react": "^18.0.0 || ^19.0.0"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  }
+}

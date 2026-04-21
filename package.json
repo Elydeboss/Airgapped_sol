@@ -1,0 +1,32 @@
+{
+  "name": "airgapped-privy-monorepo",
+  "version": "0.1.0",
+  "private": true,
+  "description": "OfflineSign - Non-custodial Air-gapped Solana SDK",
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
+  "scripts": {
+    "build": "turbo run build",
+    "dev": "turbo run dev",
+    "lint": "turbo run lint",
+    "test": "turbo run test",
+    "clean": "turbo run clean",
+    "format": "prettier --write \"**/*.{ts,tsx,md}\"",
+    "sdk:build": "cd packages/sdk && bun run build",
+    "demo:dev": "cd apps/demo && bun run dev"
+  },
+  "devDependencies": {
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prettier": "^3.4.0",
+    "turbo": "^2.3.0",
+    "typescript": "^5.7.0"
+  },
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.0.0"
+  },
+  "packageManager": "bun@1.1.0"
+}

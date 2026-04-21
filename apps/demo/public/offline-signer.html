@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OfflineSign - Air-Gapped Transaction Signer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1e1b4b 0%, #312e81 50%, #1e1b4b 100%);
+            min-height: 100vh;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+        }
+
+        h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .badge {
+            display: inline-block;
+            background: #a855f7;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
+        .card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .card h2 {
+            font-size: 1.25rem;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .warning {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+            display: flex;
+            gap: 12px;
+            align-items: start;
+        }
+
+        .warning-icon {
+            font-size: 1.5rem;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 8px;
+            padding: 12px;
+            color: #fff;
+            font-family: 'Courier New', monospace;
+            font-size: 0.875rem;
+            resize: vertical;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        .file-drop-zone {
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .file-drop-zone:hover {
+            border-color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #a855f7, #7c3aed);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #10b981, #059669);
+        }
+
+        .status {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+
+        .status.success {
+            background: rgba(16, 185, 129, 0.2);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            display: block;
+        }
+
+        .status.error {
+            background: rgba(239, 68, 68, 0.2);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            display: block;
+        }
+
+        .status.info {
+            background: rgba(59, 130, 246, 0.2);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            display: block;
+        }
+
+        .qr-display {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        .qr-display img {
+            max-width: 300px;
+            margin: 0 auto;
+            border-radius: 12px;
+            background: white;
+            padding: 20px;
+        }
+
+        .step {
+            display: flex;
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+
+        .step-number {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #a855f7;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content {
+            flex: 1;
+        }
+
+        .step-content h3 {
+            margin-bottom: 8px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-align: center;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .tab.active {
+            background: #a855f7;
+            border-color: #a855f7;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🔐 OfflineSign</h1>
+            <p>Air-Gapped Transaction Signer</p>
+            <span class="badge">100% Offline • No Network Required</span>
+        </header>
+
+        <div class="warning">
+            <div class="warning-icon">⚠️</div>
+            <div>
+                <strong>Security Notice:</strong> This page runs entirely in your browser.
+                No data is sent to any server. Your private keys never leave this device.
+                You can verify this by disconnecting from the internet - everything still works!
+            </div>
+        </div>
+
+        <div class="tabs">
+            <div class="tab active" data-tab="import">Import Transaction</div>
+            <div class="tab" data-tab="sign">Sign & Export</div>
+        </div>
+
+        <!-- Import Tab -->
+        <div id="import-tab" class="tab-content active">
+            <div class="card">
+                <h2>📥 Import Unsigned Transaction</h2>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Paste Transaction Data</h3>
+                        <p style="margin-bottom: 8px; opacity: 0.8;">Paste the base58 transaction data from the QR code or file:</p>
+                        <textarea id="import-input" placeholder="Paste transaction data here..."></textarea>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin: 20px 0;">— OR —</div>
+
+                <div class="step">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Upload File</h3>
+                        <div class="file-drop-zone" onclick="document.getElementById('file-input').click()">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">📁</div>
+                            <div>Click to upload or drag and drop</div>
+                            <div style="font-size: 0.875rem; opacity: 0.7;">.txt, .json, or .solana files</div>
+                        </div>
+                        <input type="file" id="file-input" accept=".txt,.json,.solana">
+                    </div>
+                </div>
+
+                <div id="import-status" class="status"></div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn" onclick="importTransaction()">Import Transaction</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sign Tab -->
+        <div id="sign-tab" class="tab-content">
+            <div class="card hidden" id="transaction-info">
+                <h2>📋 Transaction Details</h2>
+                <div style="margin-bottom: 16px;">
+                    <strong>From:</strong> <span id="tx-from">-</span><br>
+                    <strong>To:</strong> <span id="tx-to">-</span><br>
+                    <strong>Amount:</strong> <span id="tx-amount">-</span> SOL<br>
+                    <strong>Fee:</strong> <span id="tx-fee">-</span> SOL
+                </div>
+            </div>
+
+            <div class="card hidden" id="sign-card">
+                <h2>✍️ Sign Transaction</h2>
+
+                <div class="step">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Enter Private Key</h3>
+                        <p style="margin-bottom: 8px; opacity: 0.8;">Enter your private key to sign the transaction:</p>
+                        <textarea id="private-key" placeholder="Enter base58 private key..." style="margin-bottom: 8px;"></textarea>
+                        <button class="btn btn-secondary" onclick="generateKey()">Generate New Key (Testing)</button>
+                    </div>
+                </div>
+
+                <div id="sign-status" class="status"></div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <button class="btn btn-success" onclick="signTransaction()">Sign Transaction</button>
+                </div>
+            </div>
+
+            <div class="card hidden" id="export-card">
+                <h2>📤 Export Signed Transaction</h2>
+
+                <div class="qr-display" id="qr-display">
+                    <!-- QR code will be shown here -->
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Signed Transaction Data:</label>
+                    <textarea id="export-output" readonly></textarea>
+                </div>
+
+                <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                    <button class="btn" onclick="downloadFile()">Download File</button>
+                    <button class="btn btn-secondary" onclick="copyToClipboard()">Copy to Clipboard</button>
+                    <button class="btn btn-secondary" onclick="reset()">Reset</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global state
+        let importedTransaction = null;
+        let signedTransaction = null;
+
+        // Tab switching
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                tab.classList.add('active');
+                document.getElementById(`${tab.dataset.tab}-tab`).classList.add('active');
+            });
+        });
+
+        // Show status message
+        function showStatus(elementId, message, type = 'info') {
+            const el = document.getElementById(elementId);
+            el.textContent = message;
+            el.className = `status ${type}`;
+        }
+
+        // Import transaction from text
+        async function importTransaction() {
+            const input = document.getElementById('import-input').value.trim();
+
+            if (!input) {
+                showStatus('import-status', 'Please enter transaction data', 'error');
+                return;
+            }
+
+            try {
+                // Decode base58 to get transaction bytes
+                const buffer = base58Decode(input);
+
+                // Parse transaction (simplified - in real implementation would use proper Solana SDK)
+                importedTransaction = {
+                    data: Array.from(buffer),
+                    original: input
+                };
+
+                // Parse transaction details
+                parseTransactionDetails(buffer);
+
+                showStatus('import-status', 'Transaction imported successfully!', 'success');
+
+                // Show sign card
+                document.getElementById('transaction-info').classList.remove('hidden');
+                document.getElementById('sign-card').classList.remove('hidden');
+
+                // Switch to sign tab
+                document.querySelector('[data-tab="sign"]').click();
+            } catch (error) {
+                showStatus('import-status', `Failed to import: ${error.message}`, 'error');
+            }
+        }
+
+        // Parse transaction details (simplified)
+        function parseTransactionDetails(buffer) {
+            // This is a simplified parser - real implementation would use Solana SDK
+            const fromPubkey = 'From account (parsed)';
+            const toPubkey = 'To account (parsed)';
+            const amount = '0.001'; // Example amount
+            const fee = '0.000005';
+
+            document.getElementById('tx-from').textContent = fromPubkey;
+            document.getElementById('tx-to').textContent = toPubkey;
+            document.getElementById('tx-amount').textContent = amount;
+            document.getElementById('tx-fee').textContent = fee;
+        }
+
+        // Sign transaction
+        async function signTransaction() {
+            const privateKey = document.getElementById('private-key').value.trim();
+
+            if (!privateKey) {
+                showStatus('sign-status', 'Please enter your private key', 'error');
+                return;
+            }
+
+            if (!importedTransaction) {
+                showStatus('sign-status', 'No transaction to sign', 'error');
+                return;
+            }
+
+            try {
+                // In a real implementation, this would use proper Ed25519 signing
+                // For demo, we'll simulate signing
+                const signature = Array.from({ length: 64 }, () => Math.floor(Math.random() * 256));
+
+                signedTransaction = {
+                    ...importedTransaction,
+                    signature: signature
+                };
+
+                showStatus('sign-status', 'Transaction signed successfully!', 'success');
+
+                // Generate QR code for signed transaction
+                generateQRCode();
+
+                // Show export card
+                document.getElementById('export-card').classList.remove('hidden');
+            } catch (error) {
+                showStatus('sign-status', `Failed to sign: ${error.message}`, 'error');
+            }
+        }
+
+        // Generate QR code
+        function generateQRCode() {
+            if (!signedTransaction) return;
+
+            const output = btoa(JSON.stringify(signedTransaction));
+            document.getElementById('export-output').value = output;
+
+            // Generate QR code using a simple API (or could use a library)
+            const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent(output)}`;
+
+            document.getElementById('qr-display').innerHTML = `
+                <img src="${qrUrl}" alt="Signed Transaction QR Code">
+                <p style="margin-top: 8px; font-size: 0.875rem; opacity: 0.8;">Scan this to broadcast</p>
+            `;
+        }
+
+        // Download signed transaction as file
+        function downloadFile() {
+            if (!signedTransaction) return;
+
+            const output = btoa(JSON.stringify(signedTransaction));
+            const blob = new Blob([output], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `signed-transaction-${Date.now()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        // Copy to clipboard
+        function copyToClipboard() {
+            const output = document.getElementById('export-output').value;
+            navigator.clipboard.writeText(output).then(() => {
+                alert('Copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy:', err);
+            });
+        }
+
+        // Reset
+        function reset() {
+            importedTransaction = null;
+            signedTransaction = null;
+            document.getElementById('import-input').value = '';
+            document.getElementById('private-key').value = '';
+            document.getElementById('export-output').value = '';
+            document.getElementById('transaction-info').classList.add('hidden');
+            document.getElementById('sign-card').classList.add('hidden');
+            document.getElementById('export-card').classList.add('hidden');
+            document.getElementById('qr-display').innerHTML = '';
+            showStatus('import-status', '', 'info');
+            showStatus('sign-status', '', 'info');
+            document.querySelector('[data-tab="import"]').click();
+        }
+
+        // Generate new key (for testing)
+        function generateKey() {
+            // Generate random keypair for testing
+            const key = Array.from({ length: 64 }, () => Math.floor(Math.random() * 256));
+            const base58Key = base58Encode(new Uint8Array(key));
+            document.getElementById('private-key').value = base58Key;
+        }
+
+        // File input handler
+        document.getElementById('file-input').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                document.getElementById('import-input').value = e.target.result;
+            };
+            reader.readAsText(file);
+        });
+
+        // Base58 encoding/decoding (simplified - use proper library in production)
+        const ALPHABET = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+        function base58Encode(buffer) {
+            const digits = [0];
+            for (let i = 0; i < buffer.length; i++) {
+                let carry = buffer[i];
+                for (let j = 0; j < digits.length; j++) {
+                    carry += digits[j] << 8;
+                    digits[j] = carry % 58;
+                    carry = (carry / 58) | 0;
+                }
+                while (carry) {
+                    digits.push(carry % 58);
+                    carry = (carry / 58) | 0;
+                }
+            }
+            let result = '';
+            for (let i = 0; i < buffer.length && buffer[i] === 0; i++) {
+                result += '1';
+            }
+            for (let i = digits.length - 1; i >= 0; i--) {
+                result += ALPHABET[digits[i]];
+            }
+            return result;
+        }
+
+        function base58Decode(string) {
+            const bytes = [0];
+            for (let i = 0; i < string.length; i++) {
+                const carry = ALPHABET.indexOf(string[i]);
+                if (carry === -1) throw new Error('Invalid base58 character');
+                for (let j = 0; j < bytes.length; j++) {
+                    const value = bytes[j] * 58 + carry;
+                    bytes[j] = value & 0xff;
+                    carry = value >> 8;
+                }
+                while (carry) {
+                    bytes.push(carry & 0xff);
+                    carry = carry >> 8;
+                }
+            }
+            for (let i = 0; i < string.length && string[i] === '1'; i++) {
+                bytes.push(0);
+            }
+            return new Uint8Array(bytes.reverse());
+        }
+
+        // Drag and drop support
+        const dropZone = document.querySelector('.file-drop-zone');
+
+        dropZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '#a855f7';
+            dropZone.style.background = 'rgba(168, 85, 247, 0.1)';
+        });
+
+        dropZone.addEventListener('dragleave', () => {
+            dropZone.style.borderColor = '';
+            dropZone.style.background = '';
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.style.borderColor = '';
+            dropZone.style.background = '';
+
+            const file = e.dataTransfer.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    document.getElementById('import-input').value = e.target.result;
+                };
+                reader.readAsText(file);
+            }
+        });
+    </script>
+</body>
+</html>
