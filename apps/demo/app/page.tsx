@@ -5,10 +5,10 @@ import {
   useWallet,
   useCreateOfflineTx,
   useScanPartialSignature,
-  SystemProgram,
-  LAMPORTS_PER_SOL,
+  getBalance as sdkGetBalance,
   useAuth,
 } from '@airgapped-priv/sdk'
+import { SystemProgram, LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { WalletButton } from '@/components/WalletButton'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
@@ -61,7 +61,7 @@ export default function Home() {
 
   const handleGetBalance = async () => {
     if (publicKey) {
-      const bal = await getBalance(publicKey.toBase58())
+      const bal = await sdkGetBalance(publicKey.toBase58())
       setBalance(bal / LAMPORTS_PER_SOL)
     }
   }
@@ -141,9 +141,17 @@ export default function Home() {
           </div>
           <div className="flex items-center gap-4">
             {isAuthenticated && user && (
-              <div className="text-sm text-gray-400">
-                Welcome, {user.username}
-              </div>
+              <>
+                <div className="text-sm text-gray-400">
+                  Welcome, {user.username}
+                </div>
+                <a
+                  href="/admin"
+                  className="text-sm text-purple-400 hover:text-purple-300 transition-colors"
+                >
+                  Admin
+                </a>
+              </>
             )}
             <ModeSelector mode={mode} onModeChange={setMode} />
             <WalletButton />

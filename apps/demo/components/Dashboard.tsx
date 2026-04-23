@@ -11,7 +11,11 @@ import {
   ArrowUpRight,
   ArrowDownLeft,
   QrCode,
+  Building2,
+  FileCheck,
+  Activity,
 } from 'lucide-react'
+import Link from 'next/link'
 
 interface DashboardProps {
   publicKey: string
@@ -39,6 +43,81 @@ export function Dashboard({ publicKey, onSignOffline }: DashboardProps) {
 
   return (
     <div className="space-y-6">
+      {/* Enterprise Features Banner */}
+      <div className="rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/30 px-6 py-4">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Building2 className="h-6 w-6 text-purple-400" />
+            <div>
+              <h3 className="font-semibold text-white">Enterprise Features Enabled</h3>
+              <p className="text-sm text-gray-400">
+                Advanced security, compliance, and governance controls active
+              </p>
+            </div>
+          </div>
+          <Link href="/admin">
+            <Button variant="outline" size="sm" className="border-purple-500/50 text-purple-300 hover:bg-purple-500/20">
+              <Shield className="mr-2 h-4 w-4" />
+              Admin Dashboard
+            </Button>
+          </Link>
+        </div>
+      </div>
+
+      {/* Enterprise Status Indicators */}
+      <div className="grid gap-4 md:grid-cols-3">
+        <Card className="border-green-500/20 bg-black/20 backdrop-blur-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-green-500/20">
+                <FileCheck className="h-5 w-5 text-green-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white">Compliance</p>
+                <p className="text-xs text-gray-400">SOC 2 / ISO 27001 Ready</p>
+              </div>
+              <div className="rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">
+                Active
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-blue-500/20 bg-black/20 backdrop-blur-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/20">
+                <Activity className="h-5 w-5 text-blue-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white">Audit Logging</p>
+                <p className="text-xs text-gray-400">Immutable trail enabled</p>
+              </div>
+              <div className="rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">
+                Active
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-purple-500/20 bg-black/20 backdrop-blur-sm">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-purple-500/20">
+                <Shield className="h-5 w-5 text-purple-400" />
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-medium text-white">Policy Enforcement</p>
+                <p className="text-xs text-gray-400">Governance rules active</p>
+              </div>
+              <div className="rounded-full bg-green-500/20 px-2 py-1 text-xs font-medium text-green-300">
+                Active
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
       {/* Wallet Overview Card */}
       <Card className="border-purple-500/20 bg-black/20 backdrop-blur-sm">
         <CardHeader>

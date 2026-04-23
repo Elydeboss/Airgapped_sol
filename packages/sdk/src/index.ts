@@ -23,6 +23,9 @@ export * from './hooks/index.js'
 // Types
 export * from './types/index.js'
 
+// Enterprise features (audit logging, RBAC, etc.)
+export * from './enterprise/index.js'
+
 // Version
 export const VERSION = '0.1.0' as const
 
